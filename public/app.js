@@ -1,0 +1,10 @@
+const themeButton=document.querySelector('.theme-toggle');
+function syncTheme(){const dark=document.documentElement.dataset.theme==='dark';themeButton.setAttribute('aria-label',`Switch to ${dark?'light':'dark'} theme`);themeButton.setAttribute('aria-pressed',String(dark));}
+syncTheme();
+themeButton.addEventListener('click',()=>{const theme=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=theme;try{localStorage.setItem('theme',theme)}catch{}syncTheme()});
+let toastTimer;
+document.querySelectorAll('[data-copy]').forEach(button=>button.addEventListener('click',async()=>{const toast=document.querySelector('.toast');try{await navigator.clipboard.writeText(button.dataset.copy);toast.textContent=button.classList.contains('copy-email')?'Email copied':'Link copied';}catch{toast.textContent=button.dataset.copy;}toast.classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.classList.remove('visible'),4000)}));
+const search=document.querySelector('#post-search');
+if(search){let active='All notes';const rows=[...document.querySelectorAll('.post-row')];const filter=()=>{const q=search.value.trim().toLowerCase();let count=0;rows.forEach(row=>{row.hidden=!(row.dataset.search.includes(q)&&(active==='All notes'||row.dataset.category===active));if(!row.hidden)count++;});document.querySelector('.results-count').textContent=`${count} ${count===1?'note':'notes'}`;document.querySelector('.empty-state').hidden=count>0;};search.addEventListener('input',filter);document.querySelectorAll('[data-filter]').forEach(button=>button.addEventListener('click',()=>{active=button.dataset.filter;document.querySelectorAll('[data-filter]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));filter();}));}
+const progress=document.querySelector('.reading-progress');
+if(progress){const update=()=>{const article=document.querySelector('.article');const max=article.offsetTop+article.offsetHeight-innerHeight;progress.style.width=`${Math.min(100,Math.max(0,scrollY/Math.max(1,max)*100))}%`;};addEventListener('scroll',update,{passive:true});addEventListener('resize',update);update();}
