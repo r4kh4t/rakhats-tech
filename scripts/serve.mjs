@@ -8,6 +8,6 @@ createServer(async(req,res)=>{try{
   const path=decodeURIComponent(new URL(req.url,'http://localhost').pathname);
   let file=resolve(root,'.'+(path==='/'?'/index.html':path));
   if(!file.startsWith(root+'/'))throw Error('Invalid path');
-  try {await stat(file)}catch{file+='.html'}
+  try {if(!(await stat(file)).isFile())file+='.html'}catch{file+='.html'}
   const body=await readFile(file);res.writeHead(200,{'Content-Type':types[extname(file)]||'application/octet-stream'});res.end(body);
 }catch{res.writeHead(404,{'Content-Type':'text/html'});res.end(await readFile(root+'/404.html'));}}).listen(4321,'127.0.0.1',()=>console.log('Local: http://127.0.0.1:4321'));
